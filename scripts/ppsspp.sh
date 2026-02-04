@@ -35,7 +35,7 @@ TAG="v1.19.3"
 	  fi
 
 	 # Ensure dependencies are installed and available
-     neededlibs=( libx11-dev libsm-dev libxext-dev git clang cmake mercurial libudev-dev libdrm-dev zlib1g-dev pkg-config libasound2-dev libfreetype6-dev libx11-xcb1 libxcb-dri2-0 )
+     neededlibs=( libx11-dev libsm-dev libxext-dev git clang cmake mercurial libudev-dev libdrm-dev zlib1g-dev pkg-config libasound2-dev libfreetype6-dev libx11-xcb1 libxcb-dri2-0 libvulkan-dev )
      updateapt="N"
      for libs in "${neededlibs[@]}"
      do
@@ -86,10 +86,10 @@ TAG="v1.19.3"
 		-DUSE_FFMPEG=YES \
 		-DUSE_SYSTEM_FFMPEG=NO \
 		-DUSE_SYSTEM_LIBPNG=OFF \
-		-DVULKAN=OFF \
+		-DVULKAN=ON \
   		-DSDL2_LIBRARY="/usr/lib/aarch64-linux-gnu/libSDL2.so" \
   		-DSDL2_INCLUDE_DIR="/usr/lib/aarch64-linux-gnu/include/SDL2" \
-		-DUSE_VULKAN_DISPLAY_KHR=OFF \
+		-DUSE_VULKAN_DISPLAY_KHR=ON \
 		-DUSING_X11_VULKAN=OFF \
 		-DUSE_WAYLAND_WSI=OFF \
 		-DUSING_FBDEV=ON \
