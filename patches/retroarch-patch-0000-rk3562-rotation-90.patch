@@ -1,0 +1,20 @@
+RK3562 RG56 Pro: use 90-degree rotation instead of 270
+
+The RK3562 panel is portrait (720x1280) like RK3326, but mounted with
+opposite rotation. SDL2 uses HAL_TRANSFORM_ROT_90 for this panel;
+RetroArch's libgo2 presenter needs GO2_ROTATION_DEGREES_90 to match.
+
+diff --git a/gfx/drivers_context/drm_go2_ctx.c b/gfx/drivers_context/drm_go2_ctx.c
+index b6e50073f4..a1b2c3d4e5 100644
+--- a/gfx/drivers_context/drm_go2_ctx.c
++++ b/gfx/drivers_context/drm_go2_ctx.c
+@@ -347,7 +347,7 @@ static void gfx_ctx_go2_drm_swap_buffers(void *data)
+    go2_presenter_post(drm->presenter,
+          surf,
+          src_x, src_y, src_w, src_h,
+          out_y, out_x, out_h, out_w,
+-         GO2_ROTATION_DEGREES_270, 2);
++         GO2_ROTATION_DEGREES_90, 2);
+    go2_context_surface_unlock(drm->context, surf);
+ #endif
+ }
