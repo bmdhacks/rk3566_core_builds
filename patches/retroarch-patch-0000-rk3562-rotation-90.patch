@@ -1,14 +1,41 @@
-RK3562 RG56 Pro: use 90-degree rotation instead of 270
+RK3562 RG56 Pro: Enable drm_go2 on portrait panel with 90-degree rotation
 
 The RK3562 panel is portrait (720x1280) like RK3326, but mounted with
 opposite rotation. SDL2 uses HAL_TRANSFORM_ROT_90 for this panel;
 RetroArch's libgo2 presenter needs GO2_ROTATION_DEGREES_90 to match.
 
+This patch also removes the portrait screen rejection check that prevents
+drm_go2 from initializing on portrait displays, and updates the pixel
+format to XRGB8888 for proper color output.
+
 diff --git a/gfx/drivers_context/drm_go2_ctx.c b/gfx/drivers_context/drm_go2_ctx.c
-index b6e50073f4..a1b2c3d4e5 100644
+index b6e50073f4..c3d4e5f6a7 100644
 --- a/gfx/drivers_context/drm_go2_ctx.c
 +++ b/gfx/drivers_context/drm_go2_ctx.c
-@@ -347,7 +347,7 @@ static void gfx_ctx_go2_drm_swap_buffers(void *data)
+@@ -118,20 +118,12 @@ static void *gfx_ctx_go2_drm_init(void *video_driver)
+
+    drm->display       = go2_display_create();
+
++   /* Report swapped dimensions so RetroArch sees landscape (1280x720) */
+    drm->native_width  = go2_display_height_get(drm->display);
+    drm->native_height = go2_display_width_get(drm->display);
+
+-   /* This driver should only be used on rotated screens */
+-   if (drm->native_width < drm->native_height)
+-   {
+-      /* This should be fixed by using wayland/weston... */
+-      go2_display_destroy(drm->display);
+-      free(drm);
+-      return NULL;
+-   }
+-
+    drm->presenter     = go2_presenter_create(drm->display,
+-         DRM_FORMAT_RGB565, 0xff000000, true);
++         DRM_FORMAT_XRGB8888, 0xff000000, true);
+
+    return drm;
+ }
+@@ -347,7 +339,7 @@ static void gfx_ctx_go2_drm_swap_buffers(void *data)
     go2_presenter_post(drm->presenter,
           surf,
           src_x, src_y, src_w, src_h,
