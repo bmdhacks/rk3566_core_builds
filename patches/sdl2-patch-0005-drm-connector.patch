@@ -1,0 +1,40 @@
+diff --git a/src/video/kmsdrm/SDL_kmsdrmvideo.c b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+index 4a436dfb8..d576f0a86 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmvideo.c
++++ b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+@@ -981,11 +981,33 @@ static int KMSDRM_InitDisplays(_THIS)
+         goto cleanup;
+     }
+ 
++    /* Read preferred connector index from /var/run/drmConn if present.
++       This allows runtime HDMI/DSI switching on handheld devices. */
++    int drmConn = -1;
++    {
++        FILE *fd;
++        int val;
++        if ((fd = fopen("/var/run/drmConn", "r")) != NULL) {
++            if (fscanf(fd, "%i", &val) == 1) {
++                if (val >= 0 && val < resources->count_connectors) {
++                    drmConn = val;
++                }
++            }
++            fclose(fd);
++        }
++    }
++
+     /* Iterate on the available connectors. For every connected connector,
+        we create an SDL_Display and add it to the list of SDL Displays. */
+     for (i = 0; i < resources->count_connectors; i++) {
+-        drmModeConnector *connector = KMSDRM_drmModeGetConnector(viddata->drm_fd,
+-                                                                 resources->connectors[i]);
++        drmModeConnector *connector;
++
++        if (drmConn >= 0 && i != drmConn) {
++            continue;
++        }
++
++        connector = KMSDRM_drmModeGetConnector(viddata->drm_fd,
++                                               resources->connectors[i]);
+ 
+         if (!connector) {
+             continue;
