@@ -11,7 +11,7 @@
 
 cur_wd="$PWD"
 bitness="$(getconf LONG_BIT)"
-TAG="v1.19.3"
+TAG="v1.20.4"
 
 	# PPSSPP Standalone build
 	if [[ "$var" == "ppsspp" ]] && [[ "$bitness" == "64" ]]; then
@@ -86,10 +86,12 @@ TAG="v1.19.3"
 		-DUSE_FFMPEG=YES \
 		-DUSE_SYSTEM_FFMPEG=NO \
 		-DUSE_SYSTEM_LIBPNG=OFF \
-		-DVULKAN=ON \
   		-DSDL2_LIBRARY="/usr/lib/aarch64-linux-gnu/libSDL2.so" \
   		-DSDL2_INCLUDE_DIR="/usr/lib/aarch64-linux-gnu/include/SDL2" \
 		-DUSE_VULKAN_DISPLAY_KHR=ON \
+		-DVULKAN=ON \
+		-DEGL_NO_X11=1 \
+        -DMESA_EGL_NO_X11_HEADERS=1 \
 		-DUSING_X11_VULKAN=OFF \
 		-DUSE_WAYLAND_WSI=OFF \
 		-DUSING_FBDEV=ON \

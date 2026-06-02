@@ -11,14 +11,14 @@
 
 cur_wd="$PWD"
 bitness="$(getconf LONG_BIT)"
-
+TAG="e6583f8bec814d8f3748f1d7738457600ce0de5"
 	# dolphin Standalone build
 	if [[ "$var" == "dolphinsa" ]] && [[ "$bitness" == "64" ]]; then
 	 cd $cur_wd
 
 	  # Now we'll start the clone and build of dolphin standalone
 	  if [ ! -d "dolphin/" ]; then
-		git clone --recursive https://github.com/rtissera/dolphin.git -b egldrm
+		git clone https://github.com/dolphin-emu/dolphin
 
 		if [[ $? != "0" ]]; then
 		  echo " "
@@ -34,9 +34,12 @@ bitness="$(getconf LONG_BIT)"
 	  fi
 
 	 cd dolphin
-	 
+	 git checkout ${TAG}
+	 git submodule update --init --recursive
 	 dolphin_patches=$(find *.patch)
-	 
+	 sed -i 's~#include <cstdlib>~#include <cstdlib>\n#include <cstdint>~g' Externals/VulkanMemoryAllocator/include/vk_mem_alloc.h
+	 sed -i 's~#include <cstdint>~#include <cstdint>\n#include <string>~g' Externals/VulkanMemoryAllocator/include/vk_mem_alloc.h
+
 	 if [[ ! -z "$dolphin_patches" ]]; then
 	  for patching in dolphinsa-patch*
 	  do
@@ -58,13 +61,25 @@ bitness="$(getconf LONG_BIT)"
              -DENABLE_EGL=ON \
              -DENABLE_EVDEV=ON \
              -DLINUX_LOCAL_DEV=ON \
-             -DOpenGL_GL_PREFERENCE=GLVND \
              -DENABLE_TESTS=OFF \
              -DENABLE_LLVM=OFF \
              -DENABLE_ANALYTICS=OFF \
              -DENABLE_X11=OFF \
              -DENABLE_LTO=ON \
+             -DENABLE_VULKAN=ON \
              -DENABLE_QT=OFF \
+             -DENABLE_NOGUI=ON \
+             -DCMAKE_BUILD_TYPE=Release \
+             -DDISTRIBUTOR="dArkOS" \
+             -DENABLE_ALSA=ON \
+             -DENABLE_CLI_TOOL=OFF \
+             -DENABLE_AUTOUPDATE=OFF \
+             -DUSE_RETRO_ACHIEVEMENTS=OFF \
+             -DUSE_DISCORD_PRESENCE=OFF \
+             -DENABLE_DRM=ON \
+             -DUSE_MGBA=OFF \
+             -DENABLE_SDL=ON \
+             -DENABLE_WAYLAND=OFF \
              -DENCODE_FRAMEDUMPS=OFF ..
 
              if [[ $? != "0" ]]; then
@@ -74,16 +89,16 @@ bitness="$(getconf LONG_BIT)"
              fi
            fi
 
-           if [[ "$0" == *"builds-alt"* ]]; then
-             mkdir -p /opt/dolphin/lib
-			 cp ../../mali/aarch64/libmali-bifrost-g52-g2p0-gbm.so /opt/dolphin/lib/libmali.so
-			 sed -i 's|/usr/local/lib/aarch64-linux-gnu/libGLESv2\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
-             sed -i 's|/usr/local/lib/aarch64-linux-gnu/libGLESv3\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
-             sed -i 's|/usr/local/lib/aarch64-linux-gnu/libgbm\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
-             sed -i 's|/usr/lib/aarch64-linux-gnu/libgbm\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
-             sed -i 's|/usr/local/lib/aarch64-linux-gnu/libEGL\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
-             sed -i 's|/usr/lib/aarch64-linux-gnu/libEGL\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
-		   fi
+           #if [[ "$0" == *"builds-alt"* ]]; then
+             #mkdir -p /opt/dolphin/lib
+	     #cp ../../mali/aarch64/libmali-bifrost-g52-g2p0-gbm.so /opt/dolphin/lib/libmali.so
+	     #sed -i 's|/usr/local/lib/aarch64-linux-gnu/libGLESv2\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
+             #sed -i 's|/usr/local/lib/aarch64-linux-gnu/libGLESv3\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
+             #sed -i 's|/usr/local/lib/aarch64-linux-gnu/libgbm\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
+             #sed -i 's|/usr/lib/aarch64-linux-gnu/libgbm\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
+             #sed -i 's|/usr/local/lib/aarch64-linux-gnu/libEGL\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
+             #sed -i 's|/usr/lib/aarch64-linux-gnu/libEGL\.so|/opt/dolphin/lib/libmali.so|g' CMakeCache.txt
+	   #fi
            make -j$(nproc)
            if [[ $? != "0" ]]; then
 		     echo " "
