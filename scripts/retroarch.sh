@@ -68,6 +68,7 @@ tag="v1.22.2"
 	    --disable-x11 \
             --disable-jack \
 	    --disable-pulse \
+	    --disable-pipewire \
 	    --disable-xrandr \
 	    --disable-winrawinput \
 	    --disable-gdi \
@@ -108,6 +109,7 @@ tag="v1.22.2"
 	    --disable-x11 \
             --disable-jack \
 	    --disable-pulse \
+	    --disable-pipewire \
         --disable-xrandr \
         --disable-winrawinput \
         --disable-gdi \
